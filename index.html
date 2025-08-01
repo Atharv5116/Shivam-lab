@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #f8f8f8;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .header .payment-mode {
+      margin-right: 10px;
+    }
+
+    .content {
+      padding-top: 80px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      margin-top: 10px;
+      margin-right: 10px;
+      padding: 8px 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="payment-mode">
+      <input type="radio" id="cash" name="paymentMode" value="Cash" checked>
+      <label for="cash">Cash</label>
+      <input type="radio" id="online" name="paymentMode" value="Online">
+      <label for="online">Online</label>
+    </div>
+    <div id="totalReports">
+      <h4>Number of Reports: <span id="reportCount">0</span></h4>
+      <h4>Total: ₹<span id="totalPrice">0</span></h4>
+    </div>
+    <div>
+      <button onclick="resetSelection()">Reset Selection</button>
+      <button onclick="generateWhatsAppLink()">Send via WhatsApp</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <table>
+      <thead>
+        <tr>
+          <th>Report Name</th>
+          <th>Container</th>
+          <th>Price (₹)</th>
+          <th>Select</th>
+        </tr>
+      </thead>
+      <tbody id="reportTable"></tbody>
+    </table>
+    <div id="selectedReports"></div>
+  </div>
+
+  <script>
+    const reports = [
+{ name: "ACETONE", container: "PLAIN", price: 200 },
+    { name: "ALBUMIN", container: "PLAIN", price: 180 },
+    { name: "ALKLINE PHOSPHATES(ALP)", container: "PLAIN", price: 220 },
+    { name: "ALLERGY TEST", container: "PLAIN", price: 3800 },
+    { name: "ALPHA FETO PROTEINE(AFP)", container: "PLAIN", price: 600 },
+    { name: "AMH", container: "PLAIN", price: 1600 },
+    { name: "AMYLASE", container: "PLAIN", price: 450 },
+    { name: "ANA IF", container: "PLAIN", price: 800 },
+    { name: "ANA PROFILE", container: "PLAIN", price: 2600 },
+    { name: "ANCA", container: "PLAIN", price: 900 },
+    { name: "ANTI CCP", container: "PLAIN", price: 900 },
+    { name: "ANTI DS DNA", container: "PLAIN", price: 800 },
+    { name: "ANTI HBC IGM", container: "PLAIN", price: 800 },
+    { name: "ANTI HBS Ag", container: "PLAIN", price: 750 },
+    { name: "ANTI PHOSPHOLIPID", container: "PLAIN", price: 900 },
+    { name: "ANTI THYROID ANTIBODY", container: "PLAIN", price: 900 },
+    { name: "ASO", container: "PLAIN", price: 500 },
+          { "name": "AFB Stain", "container": "Sterile Container", "price": 250 },
+          { "name": "Albert Stain", "container": "Sterile Container", "price": 450 },
+  { "name": "APTT 2 ml Must", "container": "Na.Citrate", "price": 350 },
+{ "name": "ABG", "container": "HEPARIN", "price": 2000 },
+{ "name": "AMMONIA", "container": "HEPARIN", "price": 600 },
+     
+          
+          
+          { "name": "ARMANI HOSP PACKAGE", "container": "E/P/C", "price": 2800 },
+            { "name": "ANTENATAL PROFILE", "container": "E/P/U", "price": 1000 },
+                { "name": "ANTENATAL PROFILE (P R PATEL)", "container": "E/P/U", "price": 800 },
+           { "name": "ANTENATAL PROFILE (NIKET PATEL)", "container": "E/P", "price": 700 },
+           { "name": "ANTENATAL PROFILE FULL (NIKET PATEL)", "container": "E/P/U", "price": 1000 },
+           { "name": "ANTENATAL PROFILE (SWEETY)", "container": "E/P/U", "price": 1000 },
+           { "name": "ANTENATAL PROFILE (PANKIT PATEL)", "container": "E/P/U", "price": 1000 },
+           { "name": "ANTENATAL PROFILE (KRUPA)", "container": "E/P/U", "price": 1000 },
+                 { name: "BETA HCG", container: "PLAIN", price: 500 },
+    { name: "BETA HCG DILUTION", container: "PLAIN", price: 250 },
+    { name: "BILIRUBIN (NOT USE CORD BLOOD)", container: "PLAIN", price: 200 },
+    { name: "BLOOD.UREA", container: "PLAIN", price: 180 },
+            { "name": "Blood Group", "container": "EDTA", "price": 100 },
+{ "name": "Blood CS", "container": "BL Culture Bottle", "price": 1500 },
+{ "name": "BICARBONATE", "container": "HEPARIN", "price": 500 },
+            {"name":"BTCT","price":200},
+    { name: "C3", container: "PLAIN", price: 600 },
+    { name: "C4", container: "PLAIN", price: 600 },
+    { name: "CA 125", container: "PLAIN", price: 1000 },
+    { name: "CA 15-3", container: "PLAIN", price: 1000 },
+    { name: "CA 19-9", container: "PLAIN", price: 1000 },
+    { name: "CALCIUM", container: "PLAIN", price: 280 },
+    { name: "C-ANCA", container: "PLAIN", price: 1800 },
+    { name: "CEA", container: "PLAIN", price: 600 },
+    { name: "CERUPLASMIN", container: "PLAIN", price: 800 },
+    { name: "CHIKENGUNIA", container: "PLAIN", price: 600 },
+    { name: "CHLORIDE", container: "PLAIN", price: 200 },
+    { name: "CHOLESTEROL", container: "PLAIN", price: 250 },
+    { name: "CHOLINISTARESE (CHE)", container: "PLAIN", price: 700 },
+    { name: "CORTISOL", container: "PLAIN", price: 500 },
+    { name: "CPK / CK", container: "PLAIN", price: 500 },
+    { name: "CREATININE", container: "PLAIN", price: 180 },
+    { name: "CRP", container: "PLAIN", price: 350 },
+          { "name": "CBC MP", "container": "EDTA", "price": 430 },
+          { "name": "CBC ", "container": "EDTA", "price": 330 },
+{ "name": "CBC PS", "container": "EDTA", "price": 430 },
+{ "name": "CD4 CD8 Count", "container": "EDTA", "price": 1500 },
+{ "name": "Coomb Test Direct", "container": "EDTA", "price": 750 },
+{ "name": "Coomb Test Indirect", "container": "EDTA", "price": 750 },
+{ "name": "Catheter Tip CS", "container": "Sterile Container", "price": 800 },
+{ "name": "CSF CS", "container": "Sterile Container", "price": 800 },
+{ "name": "CVP Tip CS", "container": "Sterile Container", "price": 800 },
+{ "name": "Culture by Vitec", "container": "Sterile Container", "price": 2000 },
+{ "name": "CPK-MB", "container": "PLAIN", "price": 600 },
+          { "name": "C-ANCA & p-ANCA", "container": "", "price": 2200 },
+                  { name: "CHAMPA HOSPTAL PRE OP  ", container: "E/P/C", price: 2000 },
+           { name: "CHAMPA HOSPTAL ON ADDMITION   ", container: "E/P", price: 1750 },
+               { name: "DENGUE", container: "PLAIN", price: 700 },
+    { name: "DHEA-S", container: "PLAIN", price: 600 },
+    { name: "DIGOXIN", container: "PLAIN", price: 700 },
+          { "name": "D-DIMER 2 ml Must ", "container": "Na.Citrate", "price": 1000 },
+    { name: "ELECTROLYTE", container: "PLAIN", price: 500 },
+    { name: "ESTRADIOL(E2)", container: "PLAIN", price: 500 },
+          { "name": "ESR", "container": "EDTA", "price": 100 },
+{ "name": "ET CS", "container": "Sterile Container", "price": 800 },
+    { name: "FERRITINE", container: "PLAIN", price: 500 },
+    { name: "FREE T3", container: "PLAIN", price: 250 },
+    { name: "FREE T4", container: "PLAIN", price: 250 },
+    { name: "FSH", container: "PLAIN", price: 350 },
+          { "name": "FIBRINOGEN 2 ml Must", "container": "Na.Citrate", "price": 650 },
+{ "name": "Fluid CS", "container": "Sterile Container", "price": 800 },
+{ "name": "Fungal CS", "container": "Sterile Container", "price": 2000 },
+        { "name": "FEVER PROFILE(B M PATEL)", "container": "E/P/U", "price": 1400 },
+              { name: "GALACTOMANNAN", container: "PLAIN", price: 1200 },
+    { name: "GGT", container: "PLAIN", price: 500 },
+    { name: "GROWTH HORMONE", container: "PLAIN", price: 800 },
+          { "name": "G6PD (before BT)", "container": "EDTA", "price": 600 },
+{ "name": "Gram Stain", "container": "Sterile Container", "price": 250 },
+    { name: "HAV", container: "PLAIN", price: 800 },
+    { name: "HbeAg", container: "PLAIN", price: 800 },
+    { name: "HBsAg", container: "PLAIN", price: 200 },
+    { name: "HCV", container: "PLAIN", price: 300 },
+{   name: "HDL", container: "PLAIN", price: 200 },
+    { name: "HEV", container: "PLAIN", price: 800 },
+    { name: "HIV", container: "PLAIN", price: 300 },
+          { "name": "HB", "container": "EDTA", "price": 130 },
+{ "name": "HB Electrophoresis", "container": "EDTA", "price": 800 },
+{ "name": "HB F (Foetal HB)", "container": "EDTA", "price": 700 },
+{ "name": "HbA1C", "container": "EDTA", "price": 500 },
+{ "name": "HBA2", "container": "EDTA", "price": 600 },
+{ "name": "HBV DNA (2 EDTA)", "container": "EDTA", "price": 3500 },
+{ "name": "HLA B 27", "container": "EDTA", "price": 2200 },
+{ "name": "Homosysteine (Fasting)", "container": "EDTA", "price": 1400 },
+            { name: "HEALTH CHECK-UP BASIC ", container: "E/P/U", price: 1100 },
+           { name: "HEALTH CHECK-UP GENERAL ", container: "E/P/U", price: 2500 },
+           { name: "HEALTH CHECK-UP EXCLUSIVE ", container: "E/P/U", price: 3500 },
+           { name: "HEALTH CHECK-UP PLATINUM ",container: "E/P/U", price: 5500 },
+    { name: "IGE", container: "PLAIN", price: 600 },
+    { name: "INSULIN", container: "PLAIN (fasting)", price: 600 },
+    { name: "IONIZED CALCIUM", container: "PLAIN", price: 400 },
+    { name: "IRON", container: "PLAIN (fresh)", price: 350 },
+          { "name": "KOH", "container": "Sterile Container", "price": 500 },
+    { name: "LDH", container: "PLAIN", price: 550 },
+    { name: "LEPTOSPIROSIS IgM", container: "PLAIN", price: 1100 },
+    { name: "LH", container: "PLAIN", price: 350 },
+    { name: "LIPASE", container: "PLAIN (fresh)", price: 450 },
+    { name: "LIPID PROFILE", container: "PLAIN (fasting)", price: 550 },
+    { name: "LITHIUM", container: "PLAIN", price: 650 },
+{ name: "LIVER FUNCTION TEST", container: "PLAIN", price: 900 },
+          { "name": "LACTATE do not tie belt(Fresh) ", "container": "HEPARIN", "price": 600 },
+{ "name": "LA TITER 2 ml Must", "container": "Na.Citrate", "price": 1100 },
+                   
+          { "name": "LIFELINE ICU PACKAGE", "container": "E/P", "price": 2300 },
+    { name: "MAGNESIUM", container: "PLAIN", price: 400 },
+          { "name": "MP by Card", "container": "EDTA", "price": 300 },
+{"name":"MONOTOUX TEST(TT)","price":150},
+{ "name": "DR NILESH DIXIT PACKAGE", "container": "E/P/C", "price": 2400 },
+    { name: "P-ANCA", container: "PLAIN", price: 1800 },
+    { name: "PHENYTOIN(EPTOIN)", container: "PLAIN", price: 600 },
+    { name: "PHOSPHURUS", container: "PLAIN", price: 300 },
+    { name: "POTASSIUM", container: "PLAIN", price: 300 },
+    { name: "PROCALCITONIN", container: "PLAIN", price: 2000 },
+    { name: "PROGESTERONE", container: "PLAIN", price: 500 },
+    { name: "PROLACTIN", container: "PLAIN", price: 400 },
+    { name: "PROTEIN E.PHORESIS", container: "PLAIN", price: 700 },
+    { name: "PROTEIN (TP)", container: "PLAIN", price: 350 },
+    { name: "PSA", container: "PLAIN", price: 550 },
+    { name: "PTH", container: "PLAIN", price: 900 },
+          { "name": "PT 2 ml Must", "container": "Na.Citrate", "price": 300 },
+{ "name": "Platelet Count", "container": "EDTA", "price": 130 },
+{ "name": "PRA (Plasma Renin Activity)", "container": "2 EDTA", "price": 0 },
+  { "name": "PS", "container": "EDTA", "price": 430 },
+{ "name": "PS for MP", "container": "EDTA", "price": 200 },
+{ "name": "Pus CS", "container": "Sterile Container", "price": 800 },
+           { name: "PRE OPERATIVE PROFILE", container: "E/P/U", price: 900 },
+          { name: "PRE OP PROFILE(P R PATEL)", container: "E/P/U", price: 700 }  ,
+          { name: "PRE OP MINOR(NIKET PATEL)", container: "E/P", price: 600 }  ,
+          { name: "PRE OP PROFILE(NIKET PATEL)", container: "E/P/U", price: 900 },
+          { name: "PRE OP PROFILE(NILESH PATEL)", container: "E/P", price: 1200 },
+          { name: "PRE OP MINOR(NILESH PATEL)", container: "E/P", price: 900 }  ,
+           { name: "PRE OP PROFILE(SWEETY PATEL)", container: "E/P/U", price: 900 },
+           { name: "PRE OP MINOR(SWEETY PATEL)", container: "E/P", price: 650 }  ,
+          { name: "PRE OP PROFILE(PANKIT PATEL)", container: "E/P/U", price: 900 },
+          { name: "PRE OP PROFILE(MAULIK PATEL)", container: "E/P/U", price: 900 },
+           { name: "PRE OP MINOR(B M PATEL)", container: "E/P/U", price: 700 }  ,
+            { name: "PRE OP PROFILE(KRUPA PATEL)", container: "E/P/U", price: 900 },
+            { name: "PRE OP PROFILE(P D PATEL)", container: "E/P/U", price: 900 },
+            { name: "PRE OP PROFILE(VINOD PATEL)", container: "E/P", price: 900 },
+          { name: "PRE OP PROFILE(BHVYA SHAH)", container: "E/P", price: 1000 },
+    { name: "RA", container: "PLAIN", price: 380 },
+    { name: "RBS/FBS/PPBS", container: "FLORIDE", price: 80 },
+    { name: "RENAL PROFILE (RFT)", container: "PLAIN", price: 1000 },
+    { name: "RTPCR CHICKENGUNIA", container: "EDTA", price: 2200 },
+    { name: "RTPCR DENGUE", container: "EDTA", price: 2200 },
+    { name: "RTPCR DENGUE/CHICKEN", container: "EDTA", price: 4000 },
+{ "name": "Retic Count", "container": "EDTA", "price": 450 },
+    { name: "SGOT", container: "PLAIN", price: 180 },
+    { name: "SGPT", container: "PLAIN", price: 200 },
+    { name: "SODIUM", container: "PLAIN", price: 300 },
+    { name: "SODIUM & POTASSIUM", container: "PLAIN", price: 500 },
+{ name: "SHRINAV DIABETIC PACKAGE ", container: "E/P/U", price: 1500 },
+{ name: "SHRINAV GENERAL PACKAGE", container: "E/P/U", price: 1000 },
+{ name: "SHRINAV PACKAGE 1-FEMALE", container: "E/P/U", price: 1500 },
+{ name: "SHRINAV PACKAGE 1-MALE", container: "E/P/U", price: 2000 },
+{ name: "SHRINAV PACKAGE 2-FEMALE", container: "E/P/U", price: 3500 },
+{ name: "SHRINAV PACKAGE 2-MALE", container: "E/P/U", price: 4000 },
+          { "name": "SPC Tip CS", "container": "Sterile Container", "price": 800 },
+{ "name": "Sputum CS", "container": "Sterile Container", "price": 800 },
+{ "name": "Stool CS", "container": "Sterile Container", "price": 800 },
+{ "name": "Swab CS", "container": "Sterile Swab", "price": 800 },
+{ name: "PIH PROFILE (DR SWEETY)", container: "E/P/C/U", price: 1600 },
+    { name: "T3", container: "PLAIN", price: 200 },
+    { name: "T4", container: "PLAIN", price: 200 },
+    { name: "TESTOSTERONE", container: "PLAIN", price: 500 },
+    { name: "TIBC", container: "PLAIN", price: 470 },
+    { name: "TORCH EVALUATION", container: "PLAIN", price: 2000 },
+    { name: "TOXOPLASMA IgG IgM", container: "PLAIN", price: 700 },
+    { name: "TPHA", container: "PLAIN", price: 600 },
+    { name: "TRIGLYCERIDE", container: "PLAIN", price: 250 },
+    { name: "TROPONIN I/T", container: "PLAIN", price: 1000 },
+    { name: "TSH", container: "PLAIN", price: 250 },
+    { name: "TYPHIDOT", container: "PLAIN", price: 500 },
+    { name: "UREA", container: "PLAIN", price: 180 },
+    { name: "URIC ACID", container: "PLAIN", price: 280 },
+{ name: "URINE", container: "URINE", price: 150 },
+{ "name": "Urine CS", "container": "Sterile Container", "price": 800 },
+    { name: "VDRL", container: "PLAIN", price: 200 },
+    { name: "VITAMIN B12", container: "PLAIN", price: 800 },
+    { name: "VITAMIN D3", container: "PLAIN", price: 1100 },
+    { name: "VIDAL SLIDE", container: "PLAIN", price: 250 },
+    { name: "VIDAL TUBE", container: "PLAIN", price: 300 },
+    ];
+
+    let selectedReports = [];
+    let totalPrice = 0;
+
+    function renderReports() {
+      const table = document.getElementById('reportTable');
+      reports.forEach((report, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${report.name}</td>
+          <td>${report.container}</td>
+          <td>₹${report.price}</td>
+          <td><input type="checkbox" onclick="toggleSelection(${index})"></td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    function toggleSelection(index) {
+      const report = reports[index];
+      const selectedIndex = selectedReports.indexOf(report);
+
+      if (selectedIndex > -1) {
+        selectedReports.splice(selectedIndex, 1);
+        totalPrice -= report.price;
+      } else {
+        selectedReports.push(report);
+        totalPrice += report.price;
+      }
+      updateSelectedReports();
+    }
+
+    function updateSelectedReports() {
+      document.getElementById("totalPrice").textContent = totalPrice;
+      document.getElementById("reportCount").textContent = selectedReports.length;
+
+      const selectedReportsDiv = document.getElementById("selectedReports");
+      selectedReportsDiv.innerHTML = selectedReports.map(report =>
+        `${report.name} - ₹${report.price}`
+      ).join('<br>');
+    }
+
+    function resetSelection() {
+      selectedReports = [];
+      totalPrice = 0;
+      document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
+      updateSelectedReports();
+    }
+
+    function generateWhatsAppLink() {
+      const modeOfPayment = document.querySelector('input[name="paymentMode"]:checked').value;
+      let message = `Mode of payment - ${modeOfPayment}\n\n`;
+
+      selectedReports.forEach(report => {
+        message += `${report.name} - ₹${report.price}\n`;
+      });
+
+      message += `\nTOTAL - ₹${totalPrice}`;
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappLink = `https://wa.me/?text=${encodedMessage}`;
+      window.open(whatsappLink, '_blank');
+    }
+
+    // Initialize table
+    renderReports();
+  </script>
+
+</body>
+</html>
